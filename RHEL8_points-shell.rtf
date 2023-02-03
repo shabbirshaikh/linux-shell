@@ -1,0 +1,331 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2707
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\froman\fcharset0 TimesNewRomanPSMT;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww13440\viewh7240\viewkind0
+\deftab709
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab709\ri0\partightenfactor0
+
+\f0\fs24 \cf0 #!/bin/bash
+\f1 \
+
+\f0 \
+bashr=/etc/bashrc
+\f1 \
+
+\f0 prfile=/etc/profile
+\f1 \
+
+\f0 slinux=/etc/selinux/config
+\f1 \
+
+\f0 gpgcheck=/etc/yum.conf
+\f1 \
+
+\f0 banner=/etc/issue
+\f1 \
+
+\f0 rpcbind=rpcbindconfig\
+
+\f1 cis=/etc/modprobe.d/CIS.conf\
+chrony=/etc/chrony.conf\
+sysctl=/etc/sysctl.conf\
+pwquality=/etc/security/pwquality.conf\
+
+\f0 #date=$(`date '+%d-%b-%Y-%H-%M')
+\f1 \
+\pard\pardeftab709\ri0\partightenfactor0
+
+\f0 \cf0 date=$(date '+%Y-%m-%d')
+\f1 \
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab709\ri0\partightenfactor0
+
+\f0 \cf0 grep "TMOUT=700" $bashr
+\f1 \
+
+\f0 if [[ $? -eq 0 ]];then
+\f1 \
+
+\f0 echo "Found correct value in $bashr"
+\f1 \
+
+\f0 else
+\f1 \
+
+\f0 echo "Adding Value in $bashr"
+\f1 \
+
+\f0 cp $bashr $bashr-$date
+\f1 \
+
+\f0 sed -i '/^TMOUT=/s/^/#/g' $bashr
+\f1 \
+
+\f0 echo "TMOUT=700" >> $bashr
+\f1 \
+
+\f0 fi
+\f1 \
+
+\f0 \
+grep "TMOUT=700" $prfile
+\f1 \
+
+\f0 if [[ $? -eq 0 ]];then
+\f1 \
+
+\f0 echo "Found correct value in $prfile"
+\f1 \
+
+\f0 else
+\f1 \
+
+\f0 echo "Adding Value in $prfile"
+\f1 \
+
+\f0 cp $prfile $prfile-$date
+\f1 \
+
+\f0 sed -i '/^TMOUT=/s/^/#/g' $prfile
+\f1 \
+\pard\pardeftab709\ri0\partightenfactor0
+
+\f0 \cf0 echo "TMOUT=700" >> $prfile
+\f1 \
+
+\f0 fi
+\f1 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab709\ri0\partightenfactor0
+
+\f0 \cf0 grep "SELINUX=permissive" $slinux
+\f1 \
+
+\f0 if [[ $? -eq 0 ]];then
+\f1 \
+
+\f0 echo "Found correct value in $slinux"
+\f1 \
+
+\f0 else
+\f1 \
+
+\f0 echo "Adding Value in $slinux"
+\f1 \
+
+\f0 cp $slinux $slinux-$date
+\f1 \
+
+\f0 sed -i '/^SELINUX=/s/^/#/g' $slinux
+\f1 \
+
+\f0 echo "SELINUX=permissive" >> $slinux
+\f1 \
+\pard\pardeftab709\ri0\partightenfactor0
+
+\f0 \cf0 fi
+\f1 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab709\ri0\partightenfactor0
+
+\f0 \cf0 echo "Set permition for cron.allow file"
+\f1 \
+
+\f0 ls -ld /etc/cron.deny /etc/at.deny
+\f1 \
+
+\f0 rm /etc/cron.deny /etc/at.deny
+\f1 \
+
+\f0 ls -ld /etc/at.allow /etc/cron.allow
+\f1 \
+
+\f0 chmod 700 /home/ec2-user/cmdb*
+\f1 \
+\pard\pardeftab709\ri0\partightenfactor0
+
+\f0 \cf0 ls -lrth /home/ec2-user/cmdb*
+\f1 \
+
+\f0 echo 'root'>>/etc/at.allow
+\f1 \
+
+\f0 echo 'root'>>/etc/cron.allow
+\f1 \
+
+\f0 chown root:root /etc/cron.allow /etc/at.allow
+\f1 \
+
+\f0 chmod go= /etc/at.allow /etc/cron.allow
+\f1 \
+
+\f0 ls -ld /etc/at.allow /etc/cron.allow
+\f1 \
+
+\f0 fi
+\f1 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab709\ri0\partightenfactor0
+
+\f0 \cf0 echo "Password Age"
+\f1 \
+
+\f0 cp /etc/login.defs /etc/login.defs-bak-$date
+\f1 \
+
+\f0 sed -i 's/PASS_MAX_DAYS.*/PASS_MAX_DAYS=60/' /etc/login.defs
+\f1 \
+\pard\pardeftab709\ri0\partightenfactor0
+
+\f0 \cf0 sed -i 's/PASS_MIN_DAYS.*/PASS_MIN_DAYS=7/' /etc/login.defs
+\f1 \
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab709\ri0\partightenfactor0
+
+\f0 \cf0 \
+\
+echo "restart postfix service"
+\f1 \
+\pard\pardeftab709\ri0\partightenfactor0
+
+\f0 \cf0 systemctl restart postfix; systemctl status  postfix
+\f1 \
+\
+
+\f0 \
+cho "restart rpcbind service"
+\f1 \
+
+\f0 systemctl is-enabled rpcbind\
+ systemctl status rpcbind
+\f1 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab709\ri0\partightenfactor0
+
+\f0 \cf0 grep "rpcbind=enabled" $rpcbind
+\f1 \
+
+\f0 if [[ $? -eq 0 ]];then
+\f1 \
+
+\f0 echo "Found correct value in $rpcbind"
+\f1 \
+
+\f0 else
+\f1 \
+
+\f0 echo "Adding Value in $rpcbind"
+\f1 \
+
+\f0 cp $rpcbindx rpcbindx-$date
+\f1 \
+
+\f0 sed -i '/^rpcbind=/s/^/#/g' $rpcbind
+\f1 \
+
+\f0 echo "rpcbind=disable" >> $rpcbind
+\f1 \
+\pard\pardeftab709\ri0\partightenfactor0
+
+\f0 \cf0 fi
+\f1 \
+\
+\
+ciscount=$(grep \'96E 'freevxfs|jffs2|hfsplus|cramfs|hfs|squashfs|udf|dccp|sctp|rds|tipc|usb-storage' /etc/modprobe.d/CIS.conf | wc -l)\
+if [[ $ciscount -eq 12 ]];then\
+echo "Found correct value in $cis"\
+else\
+echo "Adding Value in $cis"\
+cp $cis $cis-$date\
+echo 'install cramfs /bin/true\
+install freevxfs /bin/true\
+install jffs2 /bin/true\
+install hfs /bin/true\
+install hfsplus /bin/true\
+install squashfs /bin/true\
+install udf /bin/true\
+install dccp /bin/true\
+install sctp /bin/true\
+install rds /bin/true\
+install tipc /bin/true\
+install usb-storage /bin/true'>/etc/modprobe.d/CIS.conf\
+fi\
+\
+chronycount=$(grep -E 'server 10.10.1.151|server 10.10.1.152|server 10.10.1.111|server 10.10.1.117' /etc/chrony.conf | wc -l)\
+if [[ $chronycount -eq 4 ]];then\
+echo "Found correct value in $chrony"\
+else\
+echo "Adding Value in $chrony"\
+cp $chrony $chrony-$date\
+echo 'server 10.10.1.151\
+server 10.10.1.152\
+server 10.10.1.111\
+server 10.10.1.117' >>/etc/chrony.conf\
+fi\
+\
+sysctlcount=$(grep -E 'fs.suid_dumpable = 0|kernel.randomize_va_space = 2|net.ipv4.ip_forward=0|net.ipv4.conf.all.forwarding=0' /etc/sysctl.conf | wc -l)\
+if [[ $sysctlcount -eq 4 ]];then\
+echo "Found correct value in $sysctl"\
+else\
+echo "Adding Value in $sysctl"\
+cp $sysctl $sysctl-$date\
+echo 'fs.suid_dumpable = 0\
+kernel.randomize_va_space = 2\
+net.ipv4.ip_forward=0\
+net.ipv4.conf.all.forwarding=0\
+net.ipv4.conf.all.accept_source_route=0\
+net.ipv4.conf.default.accept_source_route=0\
+net.ipv4.conf.all.secure_redirects=0\
+net.ipv4.conf.default.secure_redirects=0\
+net.ipv4.conf.all.log_martians=1\
+net.ipv4.conf.default.log_martians=1\
+net.ipv4.conf.default.rp_filter=1\
+net.ipv4.conf.all.rp_filter = 1\
+net.ipv4.icmp_echo_ignore_broadcasts=1\
+net.ipv4.tcp_syncookies = 1\
+net.ipv6.conf.all.accept_ra=0\
+net.ipv6.conf.default.accept_ra=0\
+net.ipv6.conf.all.accept_source_route=0\
+net.ipv6.conf.default.accept_source_route=0'>>/etc/sysctl.conf\
+fi\
+\
+\
+\
+pwqualitycount=$(grep -E '^minlen = 8|^dcredit = -1|^ucredit = -1|^lcredit = -1|^ocredit = -1' /etc/security/pwquality.conf | wc -l)\
+if [[ $pwqualitycount -eq 5 ]];then\
+echo "Found correct value in $pwquality"\
+else\
+echo "Adding Value in $pwquality"\
+cp $pwquality $pwquality-$date\
+echo 'minlen = 8\
+dcredit = -1\
+ucredit = -1\
+lcredit = -1\
+ocredit = -1'>>/etc/security/pwquality.conf\
+fi\
+\
+echo \'93set permissions\'94\
+chmod g-w  /home/sybase/.InstallAnywhere\
+chmod g-w  /home/sybase/.com.zerog.registry.xml\
+chmod o-w  /home/sybase/.com.zerog.registry.xml\
+chmod g-w  /home/sybase/.java\
+chmod g-w  /home/sybase/.oracle_jre_usage\
+\
+echo \'93set cron files permission\'94\
+chown root:root /etc/crontab /etc/cron.hourly /etc/cron.daily /etc/cron.weekly /etc/cron.monthly /etc/cron.d\
+chmod go-rwx /etc/crontab /etc/cron.hourly /etc/cron.daily /etc/cron.weekly /etc/cron.monthly /etc/cron.d\
+\
+filepermission=$(/usr/bin/ls -dl /etc/crontab /etc/cron.hourly /etc/cron.daily /etc/cron.weekly /etc/cron.monthly /etc/cron.d)\
+echo $filepermission\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab709\ri0\partightenfactor0
+
+\f0 \cf0 \
+Exit\
+
+\f1 \
+\pard\pardeftab709\ri0\partightenfactor0
+\cf0 \
+}

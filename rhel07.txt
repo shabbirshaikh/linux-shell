@@ -1,0 +1,199 @@
+#!/bin/bash
+
+date=$(date '+%Y-%m-%d')
+
+caudit=/etc/audit/auditd.conf
+fstab=/etc/fstab
+
+grep "max_log_file = 100" $caudit
+if [[ $? -eq 0 ]];then
+echo "Found correct value in $caudit"
+else
+echo "Adding Value in $caudit"
+cp $caudit $caudit-$date
+sed -i '/^max_log_file =/s/^/#/g' $caudit
+echo "max_log_file = 100" >> $caudit
+fi
+
+
+grep "space_left_action = email" $caudit
+if [[ $? -eq 0 ]];then
+echo "Found correct value in $caudit"
+else
+echo "Adding Value in $caudit"
+cp $caudit $caudit-$date
+sed -i '/^space_left_action =/s/^/#/g' $caudit
+echo "space_left_action = email" >> $caudit
+fi
+
+grep "action_mail_acct = root" $caudit
+if [[ $? -eq 0 ]];then
+echo "Found correct value in $caudit"
+else
+echo "Adding Value in $caudit"
+cp $caudit $caudit-$date
+sed -i '/^action_mail_acct =/s/^/#/g' $caudit
+echo "action_mail_acct = root" >> $caudit
+fi
+
+grep "max_log_file_action = keep_logs" $caudit
+if [[ $? -eq 0 ]];then
+echo "Found correct value in $caudit"
+else
+echo "Adding Value in $caudit"
+cp $caudit $caudit-$date
+sed -i '/^max_log_file_action =/s/^/#/g' $caudit
+echo "max_log_file_action = keep_logs" >> $caudit
+fi
+
+fstabcount=$(grep -E 'nodev|nosuid|noexec' /etc/fstab | wc -l)
+if [[ $fstabcount -eq 1 ]];then
+echo "Found correct value in $fstab"
+else
+echo "Adding Value in $fstab"
+cp $fstab $fstab-$date
+echo 'tmpfs /dev/shm tmpfs nodev,nosuid,noexec   0   0' >> $fstab
+/usr/bin/mount -o remount,nodev,nosuid,noexec /dev/shm
+fi
+
+kvm=/etc/logrotate.d/kvm_stat
+grep "monthly" $kvm
+if [[ $? -eq 0 ]];then
+echo "Found correct value in $kvm"
+else
+echo "Adding Value in $kvm"
+cp $kvm $kvm-$date
+echo "yearly
+    monthly
+    weekly
+    daily" >> $kvm
+fi
+
+
+libreswan=/etc/logrotate.d/libreswan
+grep "monthly" $libreswan
+if [[ $? -eq 0 ]];then
+echo "Found correct value in $libreswan"
+else
+echo "Adding Value in $libreswan"
+cp $libreswan $libreswan-$date
+echo "yearly
+    monthly
+    weekly
+    daily" >> $libreswan
+fi
+
+
+samba=/etc/logrotate.d/samba
+grep "monthly" $samba
+if [[ $? -eq 0 ]];then
+echo "Found correct value in $samba"
+else
+echo "Adding Value in $samba"
+cp $samba $samba-$date
+echo "yearly
+    monthly
+    weekly
+    daily" >> $samba
+fi
+
+subm=/etc/logrotate.d/subscription-manager
+grep "monthly" $subm
+if [[ $? -eq 0 ]];then
+echo "Found correct value in $subm"
+else
+echo "Adding Value in $subm"
+cp $subm $subm-$date
+echo "yearly
+    monthly
+    weekly
+    daily" >> $subm
+fi
+
+syslog=/etc/logrotate.d/syslog
+grep "monthly" $syslog
+if [[ $? -eq 0 ]];then
+echo "Found correct value in $syslog"
+else
+echo "Adding Value in $syslog"
+cp $syslog $syslog-$date
+echo "yearly
+    monthly
+    weekly
+    daily" >> $syslog
+fi
+
+
+up2date=/etc/logrotate.d/up2date
+grep "monthly" $up2date
+if [[ $? -eq 0 ]];then
+echo "Found correct value in $up2date"
+else
+echo "Adding Value in $up2date"
+cp $up2date $up2date-$date
+echo "yearly
+    monthly
+    weekly
+    daily" >> $up2date
+fi
+
+limit=/etc/security/limits.conf
+grep "* hard core 0" $limit
+if [[ $? -eq 0 ]];then
+echo "Found correct value in $limit"
+else
+echo "Adding Value in $limit"
+cp $limit $limit-$date
+sed -i '/^* hard core/s/^/#/g' $limit
+echo "* hard core 0" >> $limit
+sysctl -p
+fi
+
+motd=/etc/motd
+banner="---------------
+
+W A R N I N G
+
+---------------
+Access to this System/Device is restricted to authorized personnel only. Unauthorized access to this system is forbidden.
+Disconnect IMMEDIATELY if you are not an authorized user!
+
+This System/Device including all related equipment, network devices (specifically including Internet access),
+other resources are provided only for authorized use.
+ All computer systems may be monitored to ensure that their use is authorized.
+Uses of this system, authorized or unauthorized, constitutes consent to monitoring of this system.
+ Unauthorized use may subject you to criminal prosecution.
+Evidence of any such unauthorized use collected during monitoring may be used for administrative, criminal or other action."
+
+grep "Access to this" $motd
+if [[ $? -eq 0 ]];then
+echo "Found correct value in $motd"
+else
+echo "Adding Value in $motd"
+cp $motd $motd-$date
+echo $banner >> $motd
+fi
+
+
+issue=/etc/issue
+grep "Access to this" $issue
+if [[ $? -eq 0 ]];then
+echo "Found correct value in $issue"
+else
+echo "Adding Value in $issue"
+cp $issue $issue-$date
+echo $banner >> $issue
+fi
+
+
+issuen=/etc/issue.net
+grep "Access to this" $issuen
+if [[ $? -eq 0 ]];then
+echo "Found correct value in $issuen"
+else
+echo "Adding Value in $issuen"
+cp $issuen $issuen-$date
+echo $banner >> $issuen
+fi
+
+Exit
